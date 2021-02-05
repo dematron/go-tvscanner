@@ -1,2 +1,2 @@
 # go-tvscanner
-Trading view scanner api client
+TradingView scanner api client
