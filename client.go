@@ -1,8 +1,6 @@
 package tvscanner
 
 import (
-	"go-tvscanner/version"
-
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -10,6 +8,8 @@ import (
 	"net/http/httputil"
 	"strings"
 	"time"
+
+	"github.com/dematron/go-tvscanner/version"
 )
 
 type client struct {
