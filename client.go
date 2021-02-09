@@ -1,6 +1,8 @@
 package tvscanner
 
 import (
+	"go-tvscanner/version"
+
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -100,6 +102,7 @@ func (c *client) do(method string, payload string, authNeeded bool) (response []
 		req.Header.Add("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")
 	}
 	req.Header.Add("DNT", "1")
+	req.Header.Add("User-Agent", "go-tvscanner/"+version.Version)
 
 	resp, err := c.doTimeoutRequest(connectTimer, req)
 	if err != nil {
