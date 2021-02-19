@@ -114,27 +114,27 @@ func (c *Scanner) PrepareData(symbol, interval string) ([]byte, error) {
 
 	data := Data{}
 	data.Symbols.Tickers = []string{symbol}
-	formattedIndicators := indicators
-	for n, ind := range indicators {
-		formattedIndicators[n] = fmt.Sprintf("%s%s", ind, dataInterval)
+	for _, ind := range indicators {
+		data.Columns = append(data.Columns, fmt.Sprintf("%s%s", ind, dataInterval))
 	}
-	data.Columns = formattedIndicators
 	return json.Marshal(data)
 }
 
-func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) RecommendSummary {
-	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), "1h")
+func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (RecommendSummary, error) {
+	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), interval)
 	if err != nil {
-		ContextLogger.Error(err)
+		ContextLogger.Error(err, exchange, symbol)
+		return RecommendSummary{}, err
 	}
 	r, err := c.client.do("POST", string(payload), false)
 	if err != nil {
-		ContextLogger.Errorf("Exchange or symbol not found %v", err)
-		return RecommendSummary{}
+		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
+		return RecommendSummary{}, err
 	}
 	err = json.Unmarshal(r, &c.data)
 	if err != nil {
 		ContextLogger.Error(err)
+		return RecommendSummary{}, err
 	}
 
 	oscillatorsCounter := map[string]int{"BUY": 0, "SELL": 0, "NEUTRAL": 0}
@@ -283,5 +283,5 @@ func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) Recom
 		BuyCount:     oscillatorsCounter["BUY"] + maCounter["BUY"],
 		SellCount:    oscillatorsCounter["SELL"] + maCounter["SELL"],
 		NeutralCount: oscillatorsCounter["NEUTRAL"] + maCounter["NEUTRAL"],
-	}
+	}, nil
 }
