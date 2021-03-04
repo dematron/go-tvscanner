@@ -32,14 +32,14 @@ func (c *Scanner) ComputeRecommend(value float64) (string, error) {
 }
 
 // ComputeSimple return "BUY", "SELL", or "NEUTRAL"
-func (c *Scanner) ComputeSimple(value float64) (string, error) {
+func (c *Scanner) ComputeSimple(value float64) string {
 	switch {
 	case value == -1:
-		return Sell, nil
+		return Sell
 	case value == 1:
-		return Buy, nil
+		return Buy
 	default:
-		return Neutral, nil
+		return Neutral
 	}
 }
 

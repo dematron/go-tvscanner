@@ -28,14 +28,19 @@ var (
 		"client_name": "tvscanner",
 	})
 
-	indicators = []string{"Recommend.Other", "Recommend.All", "Recommend.MA", "RSI", "RSI[1]", "Stoch.K", "Stoch.D", "Stoch.K[1]", "Stoch.D[1]", "CCI20", "CCI20[1]", "ADX", "ADX+DI", "ADX-DI", "ADX+DI[1]", "ADX-DI[1]", "AO", "AO[1]", "Mom", "Mom[1]", "MACD.macd", "MACD.signal", "Rec.Stoch.RSI", "Stoch.RSI.K", "Rec.WR", "W.R", "Rec.BBPower", "BBPower", "Rec.UO", "UO", "close", "EMA5", "SMA5", "EMA10", "SMA10", "EMA20", "SMA20", "EMA30", "SMA30", "EMA50", "SMA50", "EMA100", "SMA100", "EMA200", "SMA200", "Rec.Ichimoku", "Ichimoku.BLine", "Rec.VWMA", "VWMA", "Rec.HullMA9", "HullMA9"}
-	pivots     = []string{"Pivot.M.Classic.S3", "Pivot.M.Classic.S2", "Pivot.M.Classic.S1", "Pivot.M.Classic.Middle", "Pivot.M.Classic.R1", "Pivot.M.Classic.R2", "Pivot.M.Classic.R3", "Pivot.M.Fibonacci.S3", "Pivot.M.Fibonacci.S2", "Pivot.M.Fibonacci.S1", "Pivot.M.Fibonacci.Middle", "Pivot.M.Fibonacci.R1", "Pivot.M.Fibonacci.R2", "Pivot.M.Fibonacci.R3", "Pivot.M.Camarilla.S3", "Pivot.M.Camarilla.S2", "Pivot.M.Camarilla.S1", "Pivot.M.Camarilla.Middle", "Pivot.M.Camarilla.R1", "Pivot.M.Camarilla.R2", "Pivot.M.Camarilla.R3", "Pivot.M.Woodie.S3", "Pivot.M.Woodie.S2", "Pivot.M.Woodie.S1", "Pivot.M.Woodie.Middle", "Pivot.M.Woodie.R1", "Pivot.M.Woodie.R2", "Pivot.M.Woodie.R3", "Pivot.M.Demark.S1", "Pivot.M.Demark.Middle", "Pivot.M.Demark.R1"}
+	//indicators = []string{"Recommend.Other", "Recommend.All", "Recommend.MA", "RSI", "RSI[1]", "Stoch.K", "Stoch.D", "Stoch.K[1]", "Stoch.D[1]", "CCI20", "CCI20[1]", "ADX", "ADX+DI", "ADX-DI", "ADX+DI[1]", "ADX-DI[1]", "AO", "AO[1]", "Mom", "Mom[1]", "MACD.macd", "MACD.signal", "Rec.Stoch.RSI", "Stoch.RSI.K", "Rec.WR", "W.R", "Rec.BBPower", "BBPower", "Rec.UO", "UO", "close", "EMA5", "SMA5", "EMA10", "SMA10", "EMA20", "SMA20", "EMA30", "SMA30", "EMA50", "SMA50", "EMA100", "SMA100", "EMA200", "SMA200", "Rec.Ichimoku", "Ichimoku.BLine", "Rec.VWMA", "VWMA", "Rec.HullMA9", "HullMA9"}
+	recommendsList  = []string{"Recommend.Other", "Recommend.All", "Recommend.MA"}
+	oscillatorsList = []string{"RSI", "RSI[1]", "Stoch.K", "Stoch.D", "Stoch.K[1]", "Stoch.D[1]", "CCI20", "CCI20[1]", "ADX", "ADX+DI", "ADX-DI", "ADX+DI[1]", "ADX-DI[1]", "AO", "AO[1]", "Mom", "Mom[1]", "MACD.macd", "MACD.signal", "Rec.Stoch.RSI", "Stoch.RSI.K", "Rec.WR", "W.R", "Rec.BBPower", "BBPower", "Rec.UO", "UO", "close"}
+	maList          = []string{"EMA10", "SMA10", "EMA20", "SMA20", "EMA30", "SMA30", "EMA50", "SMA50", "EMA100", "SMA100", "EMA200", "SMA200"}
+	maSimpleList    = []string{"Rec.Ichimoku", "Ichimoku.BLine", "Rec.VWMA", "VWMA", "Rec.HullMA9", "HullMA9"}
+	pivots          = []string{"Pivot.M.Classic.S3", "Pivot.M.Classic.S2", "Pivot.M.Classic.S1", "Pivot.M.Classic.Middle", "Pivot.M.Classic.R1", "Pivot.M.Classic.R2", "Pivot.M.Classic.R3", "Pivot.M.Fibonacci.S3", "Pivot.M.Fibonacci.S2", "Pivot.M.Fibonacci.S1", "Pivot.M.Fibonacci.Middle", "Pivot.M.Fibonacci.R1", "Pivot.M.Fibonacci.R2", "Pivot.M.Fibonacci.R3", "Pivot.M.Camarilla.S3", "Pivot.M.Camarilla.S2", "Pivot.M.Camarilla.S1", "Pivot.M.Camarilla.Middle", "Pivot.M.Camarilla.R1", "Pivot.M.Camarilla.R2", "Pivot.M.Camarilla.R3", "Pivot.M.Woodie.S3", "Pivot.M.Woodie.S2", "Pivot.M.Woodie.S1", "Pivot.M.Woodie.Middle", "Pivot.M.Woodie.R1", "Pivot.M.Woodie.R2", "Pivot.M.Woodie.R3", "Pivot.M.Demark.S1", "Pivot.M.Demark.Middle", "Pivot.M.Demark.R1"}
 )
 
 // Scanner represent a Scanner client
 type Scanner struct {
-	client *client
-	data   DataResponse
+	client           *client
+	data             DataResponse
+	recommendSummary RecommendSummary
 }
 
 type Data struct {
@@ -57,10 +62,16 @@ type DataResponse struct {
 }
 
 type RecommendSummary struct {
-	Recommend    string
+	Recommend    Recommend
 	BuyCount     int
 	SellCount    int
 	NeutralCount int
+}
+
+type Recommend struct {
+	Summary        string
+	Oscillators    string
+	MovingAverages string
 }
 
 // New returns an instantiated Scanner struct
@@ -78,8 +89,16 @@ func (c *Scanner) SetDebug(enable bool) {
 	c.client.debug = enable
 }
 
+func concatAppend(slices [][]string) []string {
+	var tmp []string
+	for _, s := range slices {
+		tmp = append(tmp, s...)
+	}
+	return tmp
+}
+
 // PrepareData prepare payload for request
-func (c *Scanner) PrepareData(symbol, interval string) ([]byte, error) {
+func (c *Scanner) PrepareData(symbol, interval string, indicators []string) ([]byte, error) {
 	// Default, 1 Day
 	dataInterval := ""
 
@@ -112,6 +131,8 @@ func (c *Scanner) PrepareData(symbol, interval string) ([]byte, error) {
 		}
 	}
 
+	//indicators := concatAppend([][]string{recommendsList, oscillatorsList, maList, maSimpleList})
+
 	data := Data{}
 	data.Symbols.Tickers = []string{symbol}
 	for _, ind := range indicators {
@@ -120,8 +141,93 @@ func (c *Scanner) PrepareData(symbol, interval string) ([]byte, error) {
 	return json.Marshal(data)
 }
 
+func (c *Scanner) PrepareRecommendations() (err error) {
+	// RECOMMENDATIONS
+	c.recommendSummary.Recommend.Oscillators, err = c.ComputeRecommend(c.data.Data[0].Data[0])
+	if err != nil {
+		ContextLogger.Error(err)
+		return err
+	}
+	c.recommendSummary.Recommend.Summary, err = c.ComputeRecommend(c.data.Data[0].Data[1])
+	if err != nil {
+		ContextLogger.Error(err)
+		return err
+	}
+	c.recommendSummary.Recommend.MovingAverages, err = c.ComputeRecommend(c.data.Data[0].Data[2])
+	if err != nil {
+		ContextLogger.Error(err)
+		return err
+	}
+
+	return nil
+}
+
+func (c *Scanner) GetRecommendations(screener, exchange, symbol, interval string) (RecommendSummary, error) {
+	indicators := concatAppend([][]string{recommendsList})
+	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), interval, indicators)
+	if err != nil {
+		ContextLogger.Error(err, exchange, symbol)
+		return RecommendSummary{}, err
+	}
+	r, err := c.client.do("POST", string(payload), false)
+	if err != nil {
+		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
+		return RecommendSummary{}, err
+	}
+	err = json.Unmarshal(r, &c.data)
+	if err != nil {
+		ContextLogger.Error(err)
+		return RecommendSummary{}, err
+	}
+
+	err = c.PrepareRecommendations()
+	if err != nil {
+		ContextLogger.Error(err)
+	}
+
+	if c.client.debug {
+		fmt.Println(c.recommendSummary.Recommend.Summary,
+			c.recommendSummary.Recommend.Oscillators,
+			c.recommendSummary.Recommend.MovingAverages,
+		)
+	}
+
+	return RecommendSummary{
+		Recommend: c.recommendSummary.Recommend,
+	}, nil
+}
+
+func (c *Scanner) GetIchimoku(screener, exchange, symbol, interval string) (Ichimoku string, value float64, err error) {
+	indicators := []string{"Rec.Ichimoku", "Ichimoku.BLine"}
+	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), interval, indicators)
+	if err != nil {
+		ContextLogger.Error(err, exchange, symbol)
+		return Ichimoku, value, err
+	}
+	r, err := c.client.do("POST", string(payload), false)
+	if err != nil {
+		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
+		return Ichimoku, value, err
+	}
+	err = json.Unmarshal(r, &c.data)
+	if err != nil {
+		ContextLogger.Error(err)
+		return Ichimoku, value, err
+	}
+
+	Ichimoku = c.ComputeSimple(c.data.Data[0].Data[0])
+	value = c.data.Data[0].Data[1]
+
+	if c.client.debug {
+		fmt.Println(Ichimoku, value)
+	}
+
+	return Ichimoku, value, nil
+}
+
 func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (RecommendSummary, error) {
-	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), interval)
+	indicators := concatAppend([][]string{recommendsList, oscillatorsList, maList, maSimpleList})
+	payload, err := c.PrepareData(fmt.Sprintf("%s:%s", exchange, symbol), interval, indicators)
 	if err != nil {
 		ContextLogger.Error(err, exchange, symbol)
 		return RecommendSummary{}, err
@@ -144,21 +250,16 @@ func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (Reco
 
 	//
 	// RECOMMENDATIONS
-	recommendOscillators, err := c.ComputeRecommend(c.data.Data[0].Data[0])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
-	recommendSummary, err := c.ComputeRecommend(c.data.Data[0].Data[1])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
-	recommendMovingAverages, err := c.ComputeRecommend(c.data.Data[0].Data[2])
+	err = c.PrepareRecommendations()
 	if err != nil {
 		ContextLogger.Error(err)
 	}
 
 	if c.client.debug {
-		fmt.Println(recommendOscillators, recommendSummary, recommendMovingAverages)
+		fmt.Println(c.recommendSummary.Recommend.Summary,
+			c.recommendSummary.Recommend.Oscillators,
+			c.recommendSummary.Recommend.MovingAverages,
+		)
 	}
 
 	// TODO: Add checking for None
@@ -193,39 +294,25 @@ func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (Reco
 	oscillatorsCounter[computedOscillators["MACD"]] += 1
 
 	// Stoch RSI
-	computedOscillators["Stoch.RSI"], err = c.ComputeSimple(c.data.Data[0].Data[22])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedOscillators["Stoch.RSI"] = c.ComputeSimple(c.data.Data[0].Data[22])
 	oscillatorsCounter[computedOscillators["Stoch.RSI"]] += 1
 
 	// W%R
-	computedOscillators["W%R"], err = c.ComputeSimple(c.data.Data[0].Data[24])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedOscillators["W%R"] = c.ComputeSimple(c.data.Data[0].Data[24])
 	oscillatorsCounter[computedOscillators["W%R"]] += 1
 
 	// BBP
-	computedOscillators["BBP"], err = c.ComputeSimple(c.data.Data[0].Data[26])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedOscillators["BBP"] = c.ComputeSimple(c.data.Data[0].Data[26])
 	oscillatorsCounter[computedOscillators["BBP"]] += 1
 
 	// UO
-	computedOscillators["UO"], err = c.ComputeSimple(c.data.Data[0].Data[28])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedOscillators["UO"] = c.ComputeSimple(c.data.Data[0].Data[28])
 	oscillatorsCounter[computedOscillators["UO"]] += 1
 
 	// MOVING AVERAGES
-	maList := []string{"EMA10", "SMA10", "EMA20", "SMA20", "EMA30", "SMA30", "EMA50", "SMA50", "EMA100", "SMA100", "EMA200", "SMA200"}
-
 	Close := c.data.Data[0].Data[30]
 	maListCounter := 0
-	for index := 33; index < 45; index++ {
+	for index := 31; index < 43; index++ {
 		if &c.data.Data[0].Data[index] != nil {
 			computedMa[maList[maListCounter]] = c.ComputeMA(c.data.Data[0].Data[index], Close)
 			maCounter[computedMa[maList[maListCounter]]] += 1
@@ -235,51 +322,42 @@ func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (Reco
 
 	// MOVING AVERAGES, pt 2
 	// ICHIMOKU
-	computedMa["Ichimoku"], err = c.ComputeSimple(c.data.Data[0].Data[45])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedMa["Ichimoku"] = c.ComputeSimple(c.data.Data[0].Data[43])
 	maCounter[computedMa["Ichimoku"]] += 1
 
 	// VWMA
-	computedMa["VWMA"], err = c.ComputeSimple(c.data.Data[0].Data[47])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedMa["VWMA"] = c.ComputeSimple(c.data.Data[0].Data[45])
 	maCounter[computedMa["VWMA"]] += 1
 
 	// HullMA (9)
-	computedMa["HullMA"], err = c.ComputeSimple(c.data.Data[0].Data[49])
-	if err != nil {
-		ContextLogger.Error(err)
-	}
+	computedMa["HullMA"] = c.ComputeSimple(c.data.Data[0].Data[47])
 	maCounter[computedMa["HullMA"]] += 1
 
 	if c.client.debug {
-		fmt.Printf("\"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d, \"COMPUTE\": %s\n",
-			recommendOscillators,
+		fmt.Printf("Summary - \"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d\n",
+			c.recommendSummary.Recommend.Summary,
+			oscillatorsCounter["BUY"]+maCounter["BUY"],
+			oscillatorsCounter["SELL"]+maCounter["SELL"],
+			oscillatorsCounter["NEUTRAL"]+maCounter["NEUTRAL"],
+		)
+		fmt.Printf("Oscillators - \"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d, \"COMPUTE\": %s\n",
+			c.recommendSummary.Recommend.Oscillators,
 			oscillatorsCounter["BUY"],
 			oscillatorsCounter["SELL"],
 			oscillatorsCounter["NEUTRAL"],
 			computedOscillators,
 		)
-		fmt.Printf("\"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d, \"COMPUTE\": %s\n",
-			recommendMovingAverages,
+		fmt.Printf("MovingAverages - \"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d, \"COMPUTE\": %s\n",
+			c.recommendSummary.Recommend.MovingAverages,
 			maCounter["BUY"],
 			maCounter["SELL"],
 			maCounter["NEUTRAL"],
 			computedMa,
 		)
-		fmt.Printf("\"RECOMMENDATION\": %s, \"BUY\": %d, \"SELL\": %d, \"NEUTRAL\": %d\n",
-			recommendSummary,
-			oscillatorsCounter["BUY"]+maCounter["BUY"],
-			oscillatorsCounter["SELL"]+maCounter["SELL"],
-			oscillatorsCounter["NEUTRAL"]+maCounter["NEUTRAL"],
-		)
 	}
 
 	return RecommendSummary{
-		Recommend:    recommendSummary,
+		Recommend:    c.recommendSummary.Recommend,
 		BuyCount:     oscillatorsCounter["BUY"] + maCounter["BUY"],
 		SellCount:    oscillatorsCounter["SELL"] + maCounter["SELL"],
 		NeutralCount: oscillatorsCounter["NEUTRAL"] + maCounter["NEUTRAL"],
