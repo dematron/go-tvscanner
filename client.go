@@ -86,10 +86,10 @@ func (c *client) doTimeoutRequest(timer *time.Timer, req *http.Request) (*http.R
 }
 
 // do prepare and process HTTP request to TradingView Scanner API
-func (c *client) do(method string, payload string, authNeeded bool) (response []byte, err error) {
+func (c *client) do(method string, sreener string, payload string, authNeeded bool) (response []byte, err error) {
 	connectTimer := time.NewTimer(c.httpTimeout)
 
-	rawurl := fmt.Sprintf("%s%s/%s", API_URL, DEFAULT_SCREENER, API_POSTFIX)
+	rawurl := fmt.Sprintf("%s%s/%s", API_URL, screener, API_POSTFIX)
 
 	if c.debug {
 		fmt.Println("url: ", rawurl)

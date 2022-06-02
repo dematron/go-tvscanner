@@ -169,7 +169,7 @@ func (c *Scanner) GetRecommendations(screener, exchange, symbol, interval string
 		ContextLogger.Error(err, exchange, symbol)
 		return RecommendSummary{}, err
 	}
-	r, err := c.client.do("POST", string(payload), false)
+	r, err := c.client.do("POST", screener, string(payload), false)
 	if err != nil {
 		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
 		return RecommendSummary{}, err
@@ -204,7 +204,7 @@ func (c *Scanner) GetIchimoku(screener, exchange, symbol, interval string) (Ichi
 		ContextLogger.Error(err, exchange, symbol)
 		return Ichimoku, value, err
 	}
-	r, err := c.client.do("POST", string(payload), false)
+	r, err := c.client.do("POST", screener, string(payload), false)
 	if err != nil {
 		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
 		return Ichimoku, value, err
@@ -232,13 +232,19 @@ func (c *Scanner) GetAnalysis(screener, exchange, symbol, interval string) (Reco
 		ContextLogger.Error(err, exchange, symbol)
 		return RecommendSummary{}, err
 	}
-	r, err := c.client.do("POST", string(payload), false)
+	r, err := c.client.do("POST", screener, string(payload), false)
 	if err != nil {
 		ContextLogger.Errorf("Exchange (%s) or symbol (%s) not found %v", exchange, symbol, err)
 		return RecommendSummary{}, err
 	}
 	err = json.Unmarshal(r, &c.data)
 	if err != nil {
+		ContextLogger.Error(err)
+		return RecommendSummary{}, err
+	}
+
+	if c.data.TotalCount <= 0 {
+		err = fmt.Errorf("No data available to analyze")
 		ContextLogger.Error(err)
 		return RecommendSummary{}, err
 	}
